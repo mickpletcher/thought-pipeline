@@ -10,14 +10,14 @@ This file is the repo level source of truth for the current project state. It is
 
 The repo currently describes a larger product vision than it implements.
 
-The README presents Thought Pipeline as an iPhone to Apple Shortcuts to n8n to LLM idea capture and enrichment system with structured storage and optional GitHub output.
+The project should support Apple Notes as an ingestion source for ideas created on iPhone.
 
 The actual tracked implementation is much smaller:
 
 1. `README.md`
    Product vision, target architecture, installation outline, and sample payloads.
 2. `iPhone-shortcut.json`
-   Canonical payload example for an iPhone Shortcut.
+   Optional direct Shortcut payload example.
 3. `schemas/`
    Input and output JSON schemas for the MVP contract.
 4. `samples/`
@@ -26,10 +26,12 @@ The actual tracked implementation is much smaller:
    Local enrichment, sample posting, and contract validation helpers.
 6. `workflows/`
    n8n MVP workflow export draft.
-7. `requirements.txt`
+7. `templates/`
+   macOS launchd template for the Mac mini worker path.
+8. `requirements.txt`
    Python dependencies for local validation and replay.
-8. `LICENSE`
-9. `.gitignore`
+9. `LICENSE`
+10. `.gitignore`
 
 ## What Is Implemented
 
@@ -37,19 +39,28 @@ The actual tracked implementation is much smaller:
 
 The project goal is clear. The README explains the intended user flow and the end state well enough for someone to understand the product direction quickly.
 
-### 2. Shortcut payload shape
+### 2. Input payload shape
 
-The shortcut sample establishes a basic inbound request shape:
+The repo now uses a standard inbound request shape that can be produced by Apple Notes pull or direct Shortcut submission:
 
 ```json
 {
-  "idea": "Dictated Text",
-  "source": "iphone_shortcut",
-  "created_at": "Current Date"
+  "raw_idea": "Idea text",
+  "captured_at": "2026-05-07T18:15:00Z",
+  "source": "ios_notes",
+  "capture_id": "ICLOUD.COM.APPLE.NOTES.note-id"
 }
 ```
 
 This contract is now backed by checked in JSON schemas.
+
+### 3. Apple Notes pull path
+
+The repo now includes a macOS script that reads notes from Apple Notes through `osascript`, converts each note to the input contract, tracks processed notes in a local state file, can post normalized payloads to the webhook, and can queue failed posts for retry.
+
+### 4. Mac mini worker path
+
+The repo now includes a macOS worker installer that creates a launchd job for a scheduled pull on the Mac mini.
 
 ## What Is Not Implemented
 
@@ -74,13 +85,17 @@ The README reads like an active MVP. The repo is still in concept plus prototype
 
 A new user can now validate schemas, run local enrichment, and post the sample payload to a webhook. The full hosted workflow still needs real n8n import validation and storage wiring.
 
-### 3. The direct shortcut path is the only active ingestion path
+### 3. Apple Notes is now a required ingestion path
 
-The repo now centers on one ingestion path:
+The repo should support this primary path:
 
-1. Direct iPhone Shortcut payload submission
+1. Create or dictate ideas into Apple Notes on iPhone
+2. Sync those notes to a Mac
+3. Pull the synced notes from the Mac Notes app
+4. Convert each note to the standard JSON contract
+5. Send the result to the workflow
 
-### 4. Storage is not finished
+### 4. Storage is still partial
 
 The contract now exists as schemas and samples, but persistent workflow managed storage is still missing.
 
@@ -92,15 +107,17 @@ There is now a local validation script for the sample contracts, but there is st
 
 The cleanest next step is:
 
-1. Make the iPhone Shortcut payload the only ingestion path for MVP.
-2. Build one working n8n flow that accepts the payload, normalizes fields, calls one LLM provider, and writes one JSON artifact.
-3. Add Markdown export only after JSON output is stable.
+1. Keep Apple Notes pull as a supported ingestion path for MVP.
+2. Keep the direct Shortcut payload path optional.
+3. Use the Mac mini as a scheduled ingestion worker.
+4. Build one working n8n flow that accepts the normalized payload, calls one LLM provider, and writes one JSON artifact.
+5. Add Markdown export only after JSON output is stable.
 
 Why this path:
 
-1. It matches the main README story.
-2. It removes polling complexity.
-3. It reduces platform dependence.
+1. It matches the desired capture flow from iPhone Notes.
+2. It keeps one normalized contract after ingestion.
+3. It still allows a direct Shortcut path when needed.
 4. It creates a clean base for later GitHub commits, ranking, search, and dashboards.
 
 ## Suggested Target Contract
@@ -111,10 +128,10 @@ Suggested inbound payload for MVP:
 
 ```json
 {
-  "raw_idea": "Dictated text from the shortcut",
-  "captured_at": "2026-05-07T15:22:00Z",
-  "source": "iphone_shortcut",
-  "capture_id": "uuid-or-short-id"
+  "raw_idea": "Idea text pulled from Apple Notes",
+  "captured_at": "2026-05-07T18:15:00Z",
+  "source": "ios_notes",
+  "capture_id": "ICLOUD.COM.APPLE.NOTES.note-id"
 }
 ```
 
@@ -122,17 +139,20 @@ Suggested initial enriched output:
 
 ```json
 {
-  "id": "idea-20260507-152200",
-  "raw_idea": "Dictated text from the shortcut",
-  "captured_at": "2026-05-07T15:22:00Z",
-  "source": "iphone_shortcut",
+  "id": "idea-20260507-181500-ICLOUD.COM.APPLE.NOTES.note-id",
+  "raw_idea": "Idea text pulled from Apple Notes",
+  "captured_at": "2026-05-07T18:15:00Z",
+  "source": "ios_notes",
+  "capture_id": "ICLOUD.COM.APPLE.NOTES.note-id",
   "summary": "Short normalized summary",
   "tags": [
     "example"
   ],
   "next_steps": [
     "First follow up action"
-  ]
+  ],
+  "provider": "openai",
+  "processed_at": "2026-05-07T18:15:05Z"
 }
 ```
 

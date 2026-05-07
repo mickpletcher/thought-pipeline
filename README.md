@@ -5,25 +5,29 @@
 [![Apple Shortcuts](https://img.shields.io/badge/Apple-Shortcuts-blue)](https://support.apple.com/guide/shortcuts/welcome/ios)
 [![OpenAI](https://img.shields.io/badge/OpenAI-Structured%20JSON-black)](https://platform.openai.com/docs/api-reference/chat/create)
 
-This project takes an idea you speak on your iPhone and turns it into structured JSON.
+This project takes ideas captured in iOS Notes and turns them into structured JSON.
 
 The goal is simple.
 
-1. Capture a thought fast
-2. Send it to a webhook
-3. Clean it up with AI or a local fallback
+1. Capture a thought in Apple Notes on iPhone
+2. Pull the synced note from Apple Notes on a Mac
+3. Send it to a webhook or process it locally
 4. Return a result you can save, search, or build on later
 
 If you are new to this kind of setup, read this file from top to bottom once, then follow the Quick Start section.
 
 ## What This Project Does
 
-You speak an idea into an iPhone Shortcut.
+You capture an idea in Apple Notes on iPhone.
 
-The Shortcut sends a JSON payload to either:
+That note syncs through iCloud to Apple Notes on a Mac.
 
-1. A local Python script for simple testing
-2. An n8n workflow for hosted processing
+A local Mac side script reads the notes, converts them to the project JSON contract, and can then:
+
+1. Save the normalized payload locally
+2. Send the payload to an n8n workflow
+
+There is also an optional direct Shortcut payload path in the repo, but Apple Notes pull is now the main ingestion path.
 
 That payload is then turned into a structured result with these fields:
 
@@ -54,33 +58,41 @@ If you do not want to learn n8n first, you can still use the local Python path i
 2. [roadmap.md](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/roadmap.md>)
    Short priority list for future work
 3. [iPhone-shortcut.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/iPhone-shortcut.json>)
-   Example request body for the Shortcut
+   Optional direct Shortcut request body
 4. [schemas/input.schema.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/schemas/input.schema.json>)
    Input contract
 5. [schemas/output.schema.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/schemas/output.schema.json>)
    Output contract
 6. [samples/sample-input.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/samples/sample-input.json>)
-   Sample request
-7. [samples/sample-output.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/samples/sample-output.json>)
+   Default Apple Notes request sample
+7. [samples/sample-ios-note-payload.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/samples/sample-ios-note-payload.json>)
+   Apple Notes request sample
+8. [samples/sample-output.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/samples/sample-output.json>)
    Sample response
-8. [scripts/enrich_idea.py](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/scripts/enrich_idea.py>)
+9. [scripts/enrich_idea.py](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/scripts/enrich_idea.py>)
    Main local processing script
-9. [scripts/validate_samples.py](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/scripts/validate_samples.py>)
+10. [scripts/validate_samples.py](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/scripts/validate_samples.py>)
    Checks that samples match the schemas
-10. [scripts/post_sample.py](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/scripts/post_sample.py>)
+11. [scripts/pull_ios_notes.py](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/scripts/pull_ios_notes.py>)
+    Pulls synced Apple Notes on macOS and converts them to the input contract
+12. [scripts/install_macos_worker.py](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/scripts/install_macos_worker.py>)
+    Creates a launchd job for the Mac mini worker
+13. [scripts/post_sample.py](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/scripts/post_sample.py>)
     Sends the sample request to a live webhook
-11. [workflows/thought-pipeline-mvp.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/workflows/thought-pipeline-mvp.json>)
+14. [workflows/thought-pipeline-mvp.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/workflows/thought-pipeline-mvp.json>)
     n8n workflow export
-12. [.env.example](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/.env.example>)
+15. [templates/macos/com.thoughtpipeline.notespull.plist.template](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/templates/macos/com.thoughtpipeline.notespull.plist.template>)
+    Reference launchd template
+16. [.env.example](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/.env.example>)
     Example environment settings
 
 ## Quick Start
 
 If you want the fastest path to a working test, do this:
 
-### Option 1: Local test only
+### Option 1: Local contract and enrichment test only
 
-Use this if you want to understand the project before touching n8n or your phone.
+Use this if you want to understand the project before touching n8n or the Mac mini.
 
 1. Install Python 3.11 or newer
 2. Open PowerShell in the repo root
@@ -96,15 +108,15 @@ python scripts/enrich_idea.py --input samples/sample-input.json --output output/
 
 If that file exists and looks correct, the local path works.
 
-### Option 2: Full hosted path with n8n
+### Option 2: Apple Notes path with n8n
 
-Use this if you want your iPhone Shortcut to send real requests to a live workflow.
+Use this if you want notes created on your iPhone to be pulled from Apple Notes and sent into the hosted workflow.
 
-1. Get n8n running
-2. Import the workflow file
-3. Set your OpenAI key in n8n
-4. Test the webhook from your computer
-5. Point your iPhone Shortcut at that webhook
+1. Make sure your iPhone Notes sync to a Mac
+2. Get n8n running
+3. Import the workflow file
+4. Set your OpenAI key in n8n
+5. Run the Apple Notes pull script on the Mac
 
 The rest of this README explains each of those steps.
 
@@ -118,11 +130,12 @@ You do not need everything on day one.
 2. Python 3.11 or newer
 3. This repo cloned locally
 
-### Required for the hosted n8n path
+### Required for the Apple Notes path
 
-1. An n8n instance
-2. An OpenAI API key
-3. An iPhone with the Shortcuts app
+1. An iPhone using Apple Notes
+2. A Mac signed into the same Apple ID with Notes sync enabled
+3. An n8n instance if you want hosted processing
+4. An OpenAI API key if you want hosted AI enrichment
 
 ## Step 1: Clone The Repo
 
@@ -150,16 +163,16 @@ What this installs:
 
 ## Step 3: Understand The Input And Output
 
-This project expects one input format.
+This project expects one input format no matter where the idea came from.
 
 Input:
 
 ```json
 {
-  "raw_idea": "Dictated text from the shortcut",
-  "captured_at": "2026-05-07T15:22:00Z",
-  "source": "iphone_shortcut",
-  "capture_id": "replace-with-uuid"
+  "raw_idea": "Idea text pulled from Apple Notes",
+  "captured_at": "2026-05-07T18:15:00Z",
+  "source": "ios_notes",
+  "capture_id": "ICLOUD.COM.APPLE.NOTES.example-note-001"
 }
 ```
 
@@ -168,9 +181,9 @@ What the fields mean:
 1. `raw_idea`
    The exact idea text
 2. `captured_at`
-   The timestamp from the Shortcut
+   The timestamp taken from the note modification time
 3. `source`
-   Where the idea came from
+   Where the idea came from such as `ios_notes` or `iphone_shortcut`
 4. `capture_id`
    A unique value so each capture can be tracked
 
@@ -178,27 +191,27 @@ Output:
 
 ```json
 {
-  "id": "idea-20260507-152200-sample-001",
-  "raw_idea": "A service that captures spoken project ideas on my phone, cleans them up, and turns them into a short action plan I can review later.",
-  "captured_at": "2026-05-07T15:22:00Z",
-  "source": "iphone_shortcut",
-  "capture_id": "sample-001",
-  "summary": "A service that captures spoken project ideas on my phone, cleans them up, and turns them into a short action plan I can review later.",
+  "id": "idea-20260507-181500-ICLOUD.COM.APPLE.NOTES.sample-note-001",
+  "raw_idea": "Build a small workflow that reads ideas from Apple Notes, converts each note to a standard JSON payload, and sends only new notes to n8n.",
+  "captured_at": "2026-05-07T18:15:00Z",
+  "source": "ios_notes",
+  "capture_id": "ICLOUD.COM.APPLE.NOTES.sample-note-001",
+  "summary": "Build a small workflow that reads ideas from Apple Notes, converts each note to a standard JSON payload, and sends only new notes to n8n.",
   "tags": [
-    "action",
-    "captures",
-    "cleans",
+    "apple",
+    "build",
+    "converts",
     "ideas",
-    "phone",
-    "project"
+    "notes",
+    "workflow"
   ],
   "next_steps": [
     "Rewrite the idea into a one sentence problem statement",
     "List the first buildable workflow that proves the concept",
-    "Review whether this idea needs research, automation, or storage first: A service that captures spoken project ideas on my phone, cleans them up, and tu..."
+    "Review whether this idea needs research, automation, or storage first: Build a small workflow that reads ideas from Apple Notes, converts each note t..."
   ],
   "provider": "local",
-  "processed_at": "2026-05-07T15:41:36Z"
+  "processed_at": "2026-05-07T18:15:05Z"
 }
 ```
 
@@ -233,9 +246,123 @@ SAMPLES_OK
 
 If you see `SAMPLES_OK`, the checked in examples match the checked in schemas.
 
-## Step 5: Run The Local Pipeline
+## Step 5: Pull Notes From Apple Notes
 
-This test processes the sample input without calling OpenAI.
+This path requires macOS.
+
+Why:
+
+1. Apple Notes does not expose a simple cross platform file store you can read from Windows
+2. The script uses `osascript` to read notes from the Mac Notes app
+3. If your iPhone and Mac sync the same Notes account, the Mac can pull the notes your phone created
+
+Before you run the script:
+
+1. Make sure the idea note exists in Apple Notes on your iPhone
+2. Make sure that note appears in the same folder on your Mac
+3. Make sure the Mac is signed into the same Apple ID and Notes sync is enabled
+4. Make sure Python is installed on the Mac mini
+
+Basic command:
+
+```powershell
+python scripts/pull_ios_notes.py --folder Ideas --dry-run --stdout
+```
+
+What this does:
+
+1. Connects to Apple Notes on the Mac
+2. Reads notes from the `Ideas` folder
+3. Converts each note to the input JSON contract
+4. Prints the payloads without writing state or posting them
+
+When you are ready to export note payloads locally:
+
+```powershell
+python scripts/pull_ios_notes.py --folder Ideas
+```
+
+That writes payload files under `output/ios-notes` and stores processed state in `output/ios-notes-state.json`.
+
+If you want to send pulled notes straight to n8n:
+
+```powershell
+python scripts/pull_ios_notes.py --folder Ideas --url "https://your-n8n-host/webhook/thought-pipeline" --secret "replace-me"
+```
+
+What gets created on the Mac mini:
+
+1. `output/ios-notes`
+   One normalized JSON file per pulled note
+2. `output/ios-notes-state.json`
+   Tracks which notes were already processed
+3. `output/pending-webhook`
+   Retry queue for payloads that could not be posted
+4. `output/ios-notes-run.log`
+   Run log in JSON line format
+
+## Step 6: Turn The Mac Mini Into A Scheduled Worker
+
+This is the recommended setup for your 2012 Mac mini.
+
+Use the Mac mini as a lightweight ingestion worker:
+
+1. iPhone writes to Notes
+2. Mac mini syncs Notes
+3. Mac mini pulls new notes every few minutes
+4. Mac mini posts normalized payloads to n8n
+5. If posting fails, the payload is queued and retried on the next run
+
+Install the launchd job on the Mac mini:
+
+```bash
+python3 scripts/install_macos_worker.py --folder Ideas --url "https://your-n8n-host/webhook/thought-pipeline" --secret "replace-me" --interval-seconds 300 --load
+```
+
+What that command does:
+
+1. Creates a LaunchAgent plist in `~/Library/LaunchAgents`
+2. Sets the worker to run at login
+3. Runs it every 300 seconds
+4. Writes launchd stdout and stderr logs under `output`
+5. Loads the job immediately when `--load` is used
+
+If you want to inspect the generated plist before loading it:
+
+```bash
+python3 scripts/install_macos_worker.py --folder Ideas --url "https://your-n8n-host/webhook/thought-pipeline" --secret "replace-me"
+```
+
+To unload the job later on the Mac mini:
+
+```bash
+launchctl unload ~/Library/LaunchAgents/com.thoughtpipeline.notespull.plist
+```
+
+To load it again:
+
+```bash
+launchctl load ~/Library/LaunchAgents/com.thoughtpipeline.notespull.plist
+```
+
+## Step 7: Check Logs On The Mac Mini
+
+After the worker runs, check these files:
+
+1. `output/ios-notes-run.log`
+   High level run events and retry events
+2. `output/launchd.stdout.log`
+   launchd standard output
+3. `output/launchd.stderr.log`
+   launchd errors
+4. `output/pending-webhook`
+   Files waiting to be retried
+
+If `pending-webhook` contains files, the Mac mini pulled the notes successfully but could not deliver them to the webhook on that run.
+
+## Step 8: Run The Local Pipeline
+
+This test processes the default Apple Notes style sample input without calling OpenAI.
 
 Run:
 
@@ -255,7 +382,7 @@ Open the result here:
 
 [output/sample-output.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/output/sample-output.json>)
 
-## Step 6: Use OpenAI Instead Of The Local Fallback
+## Step 9: Use OpenAI Instead Of The Local Fallback
 
 This part is optional.
 
@@ -291,7 +418,7 @@ How `--provider auto` works:
 1. If `OPENAI_API_KEY` exists, it uses OpenAI
 2. If `OPENAI_API_KEY` does not exist, it uses the local fallback
 
-## Step 7: Get n8n Running
+## Step 10: Get n8n Running
 
 You have two common options.
 
@@ -313,7 +440,7 @@ Then open:
 
 [http://localhost:5678](http://localhost:5678)
 
-## Step 8: Import The Workflow Into n8n
+## Step 11: Import The Workflow Into n8n
 
 This repo includes a workflow export here:
 
@@ -339,7 +466,7 @@ What the workflow does:
 5. `Return Response`
    Sends JSON back to the caller
 
-## Step 9: Configure OpenAI In n8n
+## Step 12: Configure OpenAI In n8n
 
 The workflow uses environment variables.
 
@@ -365,7 +492,7 @@ Important note:
 
 That file is only an example. It does not automatically load into n8n by itself. You still need to set those values in the environment that starts n8n.
 
-## Step 10: Test The n8n Webhook From Your Computer
+## Step 13: Test The n8n Webhook From Your Computer
 
 Once the workflow is imported and active, get the webhook URL from n8n.
 
@@ -389,7 +516,17 @@ What success looks like:
 2. The body contains JSON
 3. The JSON includes `summary`, `tags`, and `next_steps`
 
-## Step 11: Build The iPhone Shortcut
+## Step 14: Optional Direct Shortcut Path
+
+You may still want a direct Shortcut path.
+
+This is optional now.
+
+Use it only if you want the phone to send payloads directly instead of relying on Apple Notes sync.
+
+The request shape is defined in [iPhone-shortcut.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/iPhone-shortcut.json>).
+
+## Step 15: Build The iPhone Shortcut
 
 On your iPhone:
 
@@ -427,7 +564,7 @@ Important beginner note:
 
 The square bracket values above are placeholders. In Shortcuts, each one should be replaced with the real Shortcut variable token, not the literal text in brackets.
 
-## Step 12: Test The Shortcut
+## Step 16: Test The Shortcut
 
 Do one simple test first.
 
@@ -484,6 +621,38 @@ Fix:
 3. Make sure any secret header matches what your workflow expects
 4. Make sure n8n can reach OpenAI
 
+### Problem: Apple Notes pull fails on Windows
+
+Fix:
+
+This is expected. The Apple Notes pull script only works on macOS because it talks to the local Notes app through AppleScript.
+
+### Problem: Apple Notes folder is not found
+
+Fix:
+
+1. Make sure the folder exists in the Mac Notes app
+2. Make sure the folder name passed to `--folder` matches exactly
+3. Make sure the notes have finished syncing from iPhone to Mac
+
+### Problem: Notes are pulled but not delivered
+
+Fix:
+
+1. Check `output/pending-webhook`
+2. Check `output/ios-notes-run.log`
+3. Check the webhook URL and secret
+4. Wait for the next scheduled run or run the worker manually again
+
+### Problem: launchd job does not run
+
+Fix:
+
+1. Check `output/launchd.stderr.log`
+2. Make sure the Python path on the Mac mini is correct
+3. Make sure the repo path did not change after installing the job
+4. Unload and load the plist again
+
 ### Problem: The Shortcut sends literal bracket text
 
 Fix:
@@ -496,16 +665,20 @@ You entered placeholder text instead of actual Shortcut variables. Replace each 
 2. Checked in response schema
 3. Sample request and sample response
 4. Local validation
-5. Local processing
-6. Sample webhook posting
-7. n8n workflow export
+5. Apple Notes pull script
+6. Scheduled Mac mini worker path
+7. Retry queue for failed webhook delivery
+8. Local processing
+9. Sample webhook posting
+10. n8n workflow export
 
 ## What Still Needs Work
 
 1. Real n8n import testing
 2. Persistent JSON storage from the workflow
-3. Duplicate detection
+3. Duplicate detection across pulled notes and direct payloads
 4. CI checks
+5. A real macOS validation pass for the Apple Notes pull script
 
 ## Good First Path For A Beginner
 
@@ -513,12 +686,13 @@ If you are not sure what to do first, use this order:
 
 1. Install Python
 2. Run `python scripts/validate_samples.py`
-3. Run the local enrichment command
-4. Read the output JSON
+3. Confirm your note syncs from iPhone to Mac
+4. Run `python scripts/pull_ios_notes.py --folder Ideas --dry-run --stdout`
 5. Set up n8n
 6. Import the workflow
-7. Test the webhook from your computer
-8. Build the iPhone Shortcut last
+7. Install the Mac mini launchd worker
+8. Run the Apple Notes pull script against the webhook
+9. Use the direct Shortcut path only if you still want it
 
 ## References
 

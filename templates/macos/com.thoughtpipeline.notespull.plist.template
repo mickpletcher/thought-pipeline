@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.thoughtpipeline.notespull</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/python3</string>
+    <string>/path/to/thought-pipeline/scripts/pull_ios_notes.py</string>
+    <string>--folder</string>
+    <string>Ideas</string>
+    <string>--url</string>
+    <string>https://your-n8n-host/webhook/thought-pipeline</string>
+    <string>--secret</string>
+    <string>replace-me</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>/path/to/thought-pipeline</string>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>StartInterval</key>
+  <integer>300</integer>
+  <key>StandardOutPath</key>
+  <string>/path/to/thought-pipeline/output/launchd.stdout.log</string>
+  <key>StandardErrorPath</key>
+  <string>/path/to/thought-pipeline/output/launchd.stderr.log</string>
+</dict>
+</plist>

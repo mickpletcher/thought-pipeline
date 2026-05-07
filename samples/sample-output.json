@@ -1,23 +1,23 @@
 {
-  "id": "idea-20260507-152200-sample-001",
-  "raw_idea": "A service that captures spoken project ideas on my phone, cleans them up, and turns them into a short action plan I can review later.",
-  "captured_at": "2026-05-07T15:22:00Z",
-  "source": "iphone_shortcut",
-  "capture_id": "sample-001",
-  "summary": "A service that captures spoken project ideas on my phone, cleans them up, and turns them into a short action plan I can review later.",
+  "id": "idea-20260507-181500-ICLOUD.COM.APPLE.NOTES.sample-note-001",
+  "raw_idea": "Build a small workflow that reads ideas from Apple Notes, converts each note to a standard JSON payload, and sends only new notes to n8n.",
+  "captured_at": "2026-05-07T18:15:00Z",
+  "source": "ios_notes",
+  "capture_id": "ICLOUD.COM.APPLE.NOTES.sample-note-001",
+  "summary": "Build a small workflow that reads ideas from Apple Notes, converts each note to a standard JSON payload, and sends only new notes to n8n.",
   "tags": [
-    "action",
-    "captures",
-    "cleans",
+    "apple",
+    "build",
+    "converts",
     "ideas",
-    "phone",
-    "project"
+    "notes",
+    "workflow"
   ],
   "next_steps": [
     "Rewrite the idea into a one sentence problem statement",
     "List the first buildable workflow that proves the concept",
-    "Review whether this idea needs research, automation, or storage first: A service that captures spoken project ideas on my phone, cleans them up, and tu..."
+    "Review whether this idea needs research, automation, or storage first: Build a small workflow that reads ideas from Apple Notes, converts each note t..."
   ],
   "provider": "local",
-  "processed_at": "2026-05-07T15:41:36Z"
+  "processed_at": "2026-05-07T18:15:05Z"
 }

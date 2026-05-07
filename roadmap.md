@@ -6,10 +6,12 @@ Last updated: 2026-05-07
 
 Make the repo runnable from one simple path.
 
-1. Choose direct iPhone Shortcut to n8n as the MVP ingestion path.
-2. Import and test the checked in n8n workflow export under `workflows/`.
-3. Keep the sample input payload under `samples/` aligned with the shortcut file.
-4. Keep `.env.example` aligned with the real setup requirements.
+1. Keep Apple Notes pull as a supported MVP ingestion path.
+2. Validate the Apple Notes pull script on a real Mac with synced iPhone notes.
+3. Validate the scheduled Mac mini worker path with launchd, logging, and retry queue behavior.
+4. Import and test the checked in n8n workflow export under `workflows/`.
+5. Keep the sample input payload under `samples/` aligned with the Apple Notes pull contract.
+6. Keep `.env.example` aligned with the real setup requirements.
 
 ## Priority 2
 
@@ -18,7 +20,8 @@ Define and prove the data contract.
 1. Keep the checked in input schema aligned with real workflow expectations.
 2. Keep the checked in output schema aligned with real workflow responses.
 3. Regenerate the sample output artifact after contract changes.
-4. Use the replay script or curl examples to verify the webhook path after workflow updates.
+4. Keep Apple Notes pulled payloads aligned with the same input schema.
+5. Use the replay script or curl examples to verify the webhook path after workflow updates.
 
 ## Priority 3
 
