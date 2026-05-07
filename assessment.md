@@ -17,11 +17,19 @@ The actual tracked implementation is much smaller:
 1. `README.md`
    Product vision, target architecture, installation outline, and sample payloads.
 2. `iPhone-shortcut.json`
-   Minimal sample payload for an iPhone Shortcut.
-3. `apple-notes-retrieval.py`
-   Early Apple Notes extraction stub for macOS using AppleScript through `osascript`.
-4. `LICENSE`
-5. `.gitignore`
+   Canonical payload example for an iPhone Shortcut.
+3. `schemas/`
+   Input and output JSON schemas for the MVP contract.
+4. `samples/`
+   Checked in sample input and sample output payloads.
+5. `scripts/`
+   Local enrichment, sample posting, and contract validation helpers.
+6. `workflows/`
+   n8n MVP workflow export draft.
+7. `requirements.txt`
+   Python dependencies for local validation and replay.
+8. `LICENSE`
+9. `.gitignore`
 
 ## What Is Implemented
 
@@ -41,43 +49,20 @@ The shortcut sample establishes a basic inbound request shape:
 }
 ```
 
-That is the only concrete contract in the repo today.
-
-### 3. Apple Notes retrieval experiment
-
-`apple-notes-retrieval.py` can read notes from the macOS Notes app by running AppleScript through `osascript`.
-
-Current behavior:
-
-1. Reads notes from the `Ideas` folder in Apple Notes.
-2. Concatenates note title and body into a delimiter based string.
-3. Splits the result into note records in Python.
-
-Current limits:
-
-1. No persistence.
-2. No deduplication.
-3. No outbound transport.
-4. No retry or error handling.
-5. No tests.
-6. macOS only.
+This contract is now backed by checked in JSON schemas.
 
 ## What Is Not Implemented
 
-The following parts are described in the README but are not present as working repo artifacts:
+The following parts are still not present as fully finished working repo artifacts:
 
-1. n8n workflow export
-2. `workflows/` directory
-3. LLM prompt and processing logic
-4. JSON output writer
-5. Markdown output writer
-6. GitHub output or commit automation
-7. Ollama or cloud provider integration
-8. Environment file example
-9. Dependency manifest such as `requirements.txt` or `pyproject.toml`
-10. Tests
-11. Replay script or local verification path
-12. Output schema beyond the sample JSON in the README
+1. Persisted JSON output directory managed by the workflow itself
+2. Markdown output writer
+3. GitHub output or commit automation
+4. Ollama integration
+5. Automated tests in CI
+6. Production secret validation inside the workflow
+7. Duplicate detection
+8. A complete hosted storage and review path beyond the raw response
 
 ## Main Gaps
 
@@ -85,35 +70,31 @@ The following parts are described in the README but are not present as working r
 
 The README reads like an active MVP. The repo is still in concept plus prototype territory.
 
-### 2. No runnable path
+### 2. Runnable path exists, but the hosted path is still partial
 
-A new user cannot clone the repo and execute a working end to end flow from the files in source control.
+A new user can now validate schemas, run local enrichment, and post the sample payload to a webhook. The full hosted workflow still needs real n8n import validation and storage wiring.
 
-### 3. No single implementation direction
+### 3. The direct shortcut path is the only active ingestion path
 
-There are two different ingestion concepts mixed together:
+The repo now centers on one ingestion path:
 
 1. Direct iPhone Shortcut payload submission
-2. Apple Notes polling on macOS
 
-Both can be valid, but the MVP should choose one primary path first.
+### 4. Storage is not finished
 
-### 4. No contract for enriched output
+The contract now exists as schemas and samples, but persistent workflow managed storage is still missing.
 
-The README includes an example enriched object, but there is no checked in schema, validation, or serializer that makes it a real contract.
+### 5. Validation exists, but CI does not
 
-### 5. No validation or regression safety
-
-There are no tests or smoke scripts for payload ingestion, dedupe, enrichment, or storage.
+There is now a local validation script for the sample contracts, but there is still no automated CI safety net.
 
 ## Recommended MVP Direction
 
 The cleanest next step is:
 
 1. Make the iPhone Shortcut payload the only ingestion path for MVP.
-2. Treat Apple Notes retrieval as optional future ingestion, not the core path.
-3. Build one working n8n flow that accepts the payload, normalizes fields, calls one LLM provider, and writes one JSON artifact.
-4. Add Markdown export only after JSON output is stable.
+2. Build one working n8n flow that accepts the payload, normalizes fields, calls one LLM provider, and writes one JSON artifact.
+3. Add Markdown export only after JSON output is stable.
 
 Why this path:
 

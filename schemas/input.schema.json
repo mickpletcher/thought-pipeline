@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/thought-pipeline/input.schema.json",
+  "title": "Thought Pipeline Input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "raw_idea",
+    "captured_at",
+    "source",
+    "capture_id"
+  ],
+  "properties": {
+    "raw_idea": {
+      "type": "string",
+      "minLength": 1
+    },
+    "captured_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source": {
+      "type": "string",
+      "minLength": 1
+    },
+    "capture_id": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

@@ -156,6 +156,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+output/
+future-upgrades.md
 
 # Spyder project settings
 .spyderproject

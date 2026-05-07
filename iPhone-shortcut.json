@@ -1,5 +1,6 @@
 {
-  "idea": "Dictated Text",
+  "raw_idea": "Dictated text from the shortcut",
+  "captured_at": "2026-05-07T15:22:00Z",
   "source": "iphone_shortcut",
-  "created_at": "Current Date"
+  "capture_id": "replace-with-uuid"
 }

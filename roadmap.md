@@ -7,27 +7,28 @@ Last updated: 2026-05-07
 Make the repo runnable from one simple path.
 
 1. Choose direct iPhone Shortcut to n8n as the MVP ingestion path.
-2. Add a real n8n workflow export under `workflows/`.
-3. Add a sample input payload under `samples/`.
-4. Add a `.env.example` or equivalent setup document for required secrets and endpoints.
+2. Import and test the checked in n8n workflow export under `workflows/`.
+3. Keep the sample input payload under `samples/` aligned with the shortcut file.
+4. Keep `.env.example` aligned with the real setup requirements.
 
 ## Priority 2
 
 Define and prove the data contract.
 
-1. Add a checked in input schema.
-2. Add a checked in enriched output schema.
-3. Save one real sample output artifact.
-4. Add a replay script or curl example that posts a sample idea and shows the expected result.
+1. Keep the checked in input schema aligned with real workflow expectations.
+2. Keep the checked in output schema aligned with real workflow responses.
+3. Regenerate the sample output artifact after contract changes.
+4. Use the replay script or curl examples to verify the webhook path after workflow updates.
 
 ## Priority 3
 
 Add the first useful AI output.
 
-1. Normalize the raw idea.
+1. Keep the raw idea normalization step stable.
 2. Generate a short summary.
 3. Generate a small tag list.
 4. Generate next steps.
+5. Decide whether local fallback enrichment stays in the MVP or becomes dev only tooling.
 
 ## Priority 4
 

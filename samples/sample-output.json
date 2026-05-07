@@ -1,0 +1,23 @@
+{
+  "id": "idea-20260507-152200-sample-001",
+  "raw_idea": "A service that captures spoken project ideas on my phone, cleans them up, and turns them into a short action plan I can review later.",
+  "captured_at": "2026-05-07T15:22:00Z",
+  "source": "iphone_shortcut",
+  "capture_id": "sample-001",
+  "summary": "A service that captures spoken project ideas on my phone, cleans them up, and turns them into a short action plan I can review later.",
+  "tags": [
+    "action",
+    "captures",
+    "cleans",
+    "ideas",
+    "phone",
+    "project"
+  ],
+  "next_steps": [
+    "Rewrite the idea into a one sentence problem statement",
+    "List the first buildable workflow that proves the concept",
+    "Review whether this idea needs research, automation, or storage first: A service that captures spoken project ideas on my phone, cleans them up, and tu..."
+  ],
+  "provider": "local",
+  "processed_at": "2026-05-07T15:41:36Z"
+}

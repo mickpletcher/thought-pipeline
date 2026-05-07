@@ -1,0 +1,150 @@
+{
+  "name": "Thought Pipeline MVP",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "thought-pipeline",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-node",
+      "name": "Inbound Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body ?? $json;\nconst rawIdea = String(body.raw_idea ?? '').trim();\nconst capturedAt = String(body.captured_at ?? '').trim();\nconst source = String(body.source ?? '').trim();\nconst captureId = String(body.capture_id ?? '').trim();\nif (!rawIdea || !capturedAt || !source || !captureId) {\n  throw new Error('raw_idea, captured_at, source, and capture_id are required');\n}\nreturn [{ json: { raw_idea: rawIdea, captured_at: capturedAt, source, capture_id: captureId } }];"
+      },
+      "id": "normalize-node",
+      "name": "Normalize Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.OPENAI_BASE_URL || 'https://api.openai.com/v1') + '/chat/completions' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$env.OPENAI_API_KEY}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"model\": $env.OPENAI_MODEL || 'gpt-4.1-mini', \"response_format\": { \"type\": \"json_schema\", \"json_schema\": { \"name\": \"thought_pipeline_output\", \"strict\": true, \"schema\": { \"type\": \"object\", \"additionalProperties\": false, \"required\": [\"summary\", \"tags\", \"next_steps\"], \"properties\": { \"summary\": { \"type\": \"string\", \"minLength\": 1 }, \"tags\": { \"type\": \"array\", \"minItems\": 1, \"maxItems\": 8, \"items\": { \"type\": \"string\", \"minLength\": 1 } }, \"next_steps\": { \"type\": \"array\", \"minItems\": 1, \"maxItems\": 6, \"items\": { \"type\": \"string\", \"minLength\": 1 } } } } } }, \"messages\": [ { \"role\": \"system\", \"content\": \"You process captured ideas. Return concise JSON only. Keep the summary short. Keep tags simple lowercase words. Keep next_steps practical and specific.\" }, { \"role\": \"user\", \"content\": JSON.stringify($json) } ] } }}",
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "id": "openai-node",
+      "name": "OpenAI Enrichment",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        760,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $('Normalize Input').first().json;\nconst content = $json.choices?.[0]?.message?.content;\nif (!content) {\n  throw new Error('OpenAI response did not include message content');\n}\nconst parsed = JSON.parse(content);\nconst processedAt = new Date().toISOString();\nconst id = `idea-${input.captured_at.replace(/[-:]/g, '').replace('T', '-').replace('Z', '')}-${input.capture_id}`;\nreturn [{ json: { id, raw_idea: input.raw_idea, captured_at: input.captured_at, source: input.source, capture_id: input.capture_id, summary: parsed.summary, tags: parsed.tags, next_steps: parsed.next_steps, provider: 'openai', processed_at: processedAt } }];"
+      },
+      "id": "shape-node",
+      "name": "Shape Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1020,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "response-node",
+      "name": "Return Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1280,
+        300
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Inbound Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Input": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Enrichment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Enrichment": {
+      "main": [
+        [
+          {
+            "node": "Shape Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Shape Output": {
+      "main": [
+        [
+          {
+            "node": "Return Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "thought-pipeline-mvp-v1",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "id": "thought-pipeline-mvp",
+  "tags": []
+}
