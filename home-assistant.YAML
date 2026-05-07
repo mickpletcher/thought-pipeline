@@ -1,0 +1,26 @@
+alias: Capture iPhone dictated idea
+mode: queued
+
+triggers:
+  - trigger: webhook
+    webhook_id: iphone_idea_capture_REPLACE_WITH_RANDOM_SECRET
+    allowed_methods:
+      - POST
+    local_only: false
+
+actions:
+  - action: todo.add_item
+    target:
+      entity_id: todo.ideas
+    data:
+      item: "{{ trigger.json.idea | truncate(180, true) }}"
+      description: |
+        Source: {{ trigger.json.source | default('iphone_shortcut') }}
+        Captured: {{ trigger.json.created_at | default(now().isoformat()) }}
+
+        Full idea:
+        {{ trigger.json.idea }}
+
+  - action: notify.mobile_app_micks_iphone
+    data:
+      message: "Idea captured in Home Assistant"
