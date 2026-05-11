@@ -5,12 +5,12 @@
 [![Apple Shortcuts](https://img.shields.io/badge/Apple-Shortcuts-blue)](https://support.apple.com/guide/shortcuts/welcome/ios)
 [![OpenAI](https://img.shields.io/badge/OpenAI-Structured%20JSON-black)](https://platform.openai.com/docs/api-reference/chat/create)
 
-This project takes ideas captured in iOS Notes and turns them into structured JSON.
+This project takes ideas captured on iPhone and turns them into structured JSON.
 
 The goal is simple.
 
-1. Capture a thought in Apple Notes on iPhone
-2. Pull the synced note from Apple Notes on a Mac
+1. Capture a thought on iPhone
+2. Send it through Apple Notes or a OneDrive Shortcut path
 3. Send it to a webhook or process it locally
 4. Return a result you can save, search, or build on later
 
@@ -18,16 +18,19 @@ If you are new to this kind of setup, read this file from top to bottom once, th
 
 ## What This Project Does
 
-You capture an idea in Apple Notes on iPhone.
+You capture an idea on iPhone.
 
-That note syncs through iCloud to Apple Notes on a Mac.
+The repo currently supports two ingestion paths:
 
-A local Mac side script reads the notes, converts them to the project JSON contract, and can then:
+1. Apple Notes sync to a Mac, then pull from Apple Notes
+2. iPhone Shortcut save to a OneDrive folder, then process from Windows or any synced machine
+
+Both paths convert the idea to the project JSON contract and can then:
 
 1. Save the normalized payload locally
 2. Send the payload to an n8n workflow
 
-There is also an optional direct Shortcut payload path in the repo, but Apple Notes pull is now the main ingestion path.
+There is also an optional direct Shortcut to webhook path in the repo.
 
 That payload is then turned into a structured result with these fields:
 
@@ -57,33 +60,45 @@ If you do not want to learn n8n first, you can still use the local Python path i
    Current project assessment and gap notes
 2. [roadmap.md](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/roadmap.md>)
    Short priority list for future work
-3. [iPhone-shortcut.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/iPhone-shortcut.json>)
-   Optional direct Shortcut request body
-4. [schemas/input.schema.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/schemas/input.schema.json>)
+3. [CHANGELOG.md](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/CHANGELOG.md>)
+   Repo change history
+4. [shortcut-onedrive.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/shortcut-onedrive.json>)
+   OneDrive Shortcut request body
+5. [shortcut-direct-webhook.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/shortcut-direct-webhook.json>)
+   Direct Shortcut to webhook request body
+6. [shortcut-dual-write.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/shortcut-dual-write.json>)
+   Shortcut request body when the same run writes to Apple Notes and OneDrive
+7. [schemas/input.schema.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/schemas/input.schema.json>)
    Input contract
-5. [schemas/output.schema.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/schemas/output.schema.json>)
+8. [schemas/output.schema.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/schemas/output.schema.json>)
    Output contract
-6. [samples/sample-input.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/samples/sample-input.json>)
+9. [samples/sample-input.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/samples/sample-input.json>)
    Default Apple Notes request sample
-7. [samples/sample-ios-note-payload.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/samples/sample-ios-note-payload.json>)
+10. [samples/sample-ios-note-payload.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/samples/sample-ios-note-payload.json>)
    Apple Notes request sample
-8. [samples/sample-output.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/samples/sample-output.json>)
+11. [samples/sample-onedrive-shortcut-payload.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/samples/sample-onedrive-shortcut-payload.json>)
+   OneDrive Shortcut request sample
+12. [samples/sample-output.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/samples/sample-output.json>)
    Sample response
-9. [scripts/enrich_idea.py](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/scripts/enrich_idea.py>)
+13. [scripts/enrich_idea.py](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/scripts/enrich_idea.py>)
    Main local processing script
-10. [scripts/validate_samples.py](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/scripts/validate_samples.py>)
+14. [scripts/validate_samples.py](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/scripts/validate_samples.py>)
    Checks that samples match the schemas
-11. [scripts/pull_ios_notes.py](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/scripts/pull_ios_notes.py>)
+15. [scripts/pull_ios_notes.py](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/scripts/pull_ios_notes.py>)
     Pulls synced Apple Notes on macOS and converts them to the input contract
-12. [scripts/install_macos_worker.py](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/scripts/install_macos_worker.py>)
+16. [scripts/process_onedrive_shortcuts.py](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/scripts/process_onedrive_shortcuts.py>)
+    Processes JSON files saved into a OneDrive folder by an iPhone Shortcut
+17. [scripts/run_ingestion.py](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/scripts/run_ingestion.py>)
+    Lets you choose Apple Notes or OneDrive with one command
+18. [scripts/install_macos_worker.py](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/scripts/install_macos_worker.py>)
     Creates a launchd job for the Mac mini worker
-13. [scripts/post_sample.py](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/scripts/post_sample.py>)
+19. [scripts/post_sample.py](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/scripts/post_sample.py>)
     Sends the sample request to a live webhook
-14. [workflows/thought-pipeline-mvp.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/workflows/thought-pipeline-mvp.json>)
+20. [workflows/thought-pipeline-mvp.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/workflows/thought-pipeline-mvp.json>)
     n8n workflow export
-15. [templates/macos/com.thoughtpipeline.notespull.plist.template](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/templates/macos/com.thoughtpipeline.notespull.plist.template>)
+21. [templates/macos/com.thoughtpipeline.notespull.plist.template](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/templates/macos/com.thoughtpipeline.notespull.plist.template>)
     Reference launchd template
-16. [.env.example](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/.env.example>)
+22. [.env.example](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/.env.example>)
     Example environment settings
 
 ## Quick Start
@@ -108,6 +123,27 @@ python scripts/enrich_idea.py --input samples/sample-input.json --output output/
 
 If that file exists and looks correct, the local path works.
 
+### Choose your preferred source
+
+The repo supports both Apple Notes and OneDrive.
+
+Set your preferred source in `.env` or your shell:
+
+```powershell
+$env:THOUGHT_PIPELINE_INGESTION_MODE="onedrive"
+```
+
+Valid values:
+
+1. `onedrive`
+2. `apple-notes`
+
+Then run the shared entry point:
+
+```powershell
+python scripts/run_ingestion.py --folder Ideas
+```
+
 ### Option 2: Apple Notes path with n8n
 
 Use this if you want notes created on your iPhone to be pulled from Apple Notes and sent into the hosted workflow.
@@ -119,6 +155,24 @@ Use this if you want notes created on your iPhone to be pulled from Apple Notes 
 5. Run the Apple Notes pull script on the Mac
 
 The rest of this README explains each of those steps.
+
+### Option 3: OneDrive Shortcut path
+
+Use this if you want the iPhone Shortcut to save idea payload files into OneDrive and let your Windows machine process them later.
+
+1. Build the iPhone Shortcut
+2. Point the save action at a OneDrive folder such as `Shortcuts/thought-pipeline/Ideas`
+3. Sync OneDrive on the computer that will process the files
+4. Run the OneDrive processor script
+
+### Option 4: Dual write Shortcut path
+
+Use this if you want one iPhone Shortcut run to:
+
+1. Save the idea into Apple Notes
+2. Save the same payload into OneDrive
+
+This gives you both a Notes copy for the Mac path and a OneDrive JSON file for the Windows path.
 
 ## Prerequisites
 
@@ -136,6 +190,29 @@ You do not need everything on day one.
 2. A Mac signed into the same Apple ID with Notes sync enabled
 3. An n8n instance if you want hosted processing
 4. An OpenAI API key if you want hosted AI enrichment
+
+### Required for the OneDrive Shortcut path
+
+1. An iPhone with the Shortcuts app
+2. Microsoft OneDrive installed and signed in on iPhone
+3. OneDrive sync enabled on the computer that will process the files
+4. Python 3.11 or newer on that computer
+
+## Preferred Source Behavior
+
+If the user prefers Apple Notes:
+
+1. Set `THOUGHT_PIPELINE_INGESTION_MODE=apple-notes`
+2. Keep using the `Ideas` folder in Apple Notes
+3. Run `python scripts/run_ingestion.py --folder Ideas`
+
+If the user prefers OneDrive:
+
+1. Set `THOUGHT_PIPELINE_INGESTION_MODE=onedrive`
+2. Save Shortcut JSON files to `OneDrive\Shortcuts\thought-pipeline\Ideas`
+3. Run `python scripts/run_ingestion.py --folder Ideas`
+
+You can still call the source specific scripts directly, but the shared runner is now the main entry point.
 
 ## Step 1: Clone The Repo
 
@@ -183,7 +260,7 @@ What the fields mean:
 2. `captured_at`
    The timestamp taken from the note modification time
 3. `source`
-   Where the idea came from such as `ios_notes` or `iphone_shortcut`
+   Where the idea came from such as `ios_notes`, `iphone_shortcut`, or `onedrive_shortcut`
 4. `capture_id`
    A unique value so each capture can be tracked
 
@@ -266,7 +343,7 @@ Before you run the script:
 Basic command:
 
 ```powershell
-python scripts/pull_ios_notes.py --folder Ideas --dry-run --stdout
+python scripts/run_ingestion.py --source apple-notes --folder Ideas --dry-run --stdout
 ```
 
 What this does:
@@ -279,26 +356,26 @@ What this does:
 When you are ready to export note payloads locally:
 
 ```powershell
-python scripts/pull_ios_notes.py --folder Ideas
+python scripts/run_ingestion.py --source apple-notes --folder Ideas
 ```
 
-That writes payload files under `output/ios-notes` and stores processed state in `output/ios-notes-state.json`.
+That writes payload files under `output/captured/apple-notes` and stores processed state in `output/state/apple-notes.json`.
 
 If you want to send pulled notes straight to n8n:
 
 ```powershell
-python scripts/pull_ios_notes.py --folder Ideas --url "https://your-n8n-host/webhook/thought-pipeline" --secret "replace-me"
+python scripts/run_ingestion.py --source apple-notes --folder Ideas --url "https://your-n8n-host/webhook/thought-pipeline" --secret "replace-me"
 ```
 
 What gets created on the Mac mini:
 
-1. `output/ios-notes`
+1. `output/captured/apple-notes`
    One normalized JSON file per pulled note
-2. `output/ios-notes-state.json`
+2. `output/state/apple-notes.json`
    Tracks which notes were already processed
-3. `output/pending-webhook`
+3. `output/pending-webhook/apple-notes`
    Retry queue for payloads that could not be posted
-4. `output/ios-notes-run.log`
+4. `output/logs/apple-notes-run.log`
    Run log in JSON line format
 
 ## Step 6: Turn The Mac Mini Into A Scheduled Worker
@@ -324,7 +401,7 @@ What that command does:
 1. Creates a LaunchAgent plist in `~/Library/LaunchAgents`
 2. Sets the worker to run at login
 3. Runs it every 300 seconds
-4. Writes launchd stdout and stderr logs under `output`
+4. Writes launchd stdout and stderr logs under `output/logs`
 5. Loads the job immediately when `--load` is used
 
 If you want to inspect the generated plist before loading it:
@@ -349,16 +426,16 @@ launchctl load ~/Library/LaunchAgents/com.thoughtpipeline.notespull.plist
 
 After the worker runs, check these files:
 
-1. `output/ios-notes-run.log`
+1. `output/logs/apple-notes-run.log`
    High level run events and retry events
-2. `output/launchd.stdout.log`
+2. `output/logs/launchd.stdout.log`
    launchd standard output
-3. `output/launchd.stderr.log`
+3. `output/logs/launchd.stderr.log`
    launchd errors
-4. `output/pending-webhook`
+4. `output/pending-webhook/apple-notes`
    Files waiting to be retried
 
-If `pending-webhook` contains files, the Mac mini pulled the notes successfully but could not deliver them to the webhook on that run.
+If `output/pending-webhook/apple-notes` contains files, the Mac mini pulled the notes successfully but could not deliver them to the webhook on that run.
 
 ## Step 8: Run The Local Pipeline
 
@@ -516,7 +593,131 @@ What success looks like:
 2. The body contains JSON
 3. The JSON includes `summary`, `tags`, and `next_steps`
 
-## Step 14: Optional Direct Shortcut Path
+## Step 14: OneDrive Shortcut Path
+
+You can use an iPhone Shortcut to save each idea as a JSON file in OneDrive.
+
+That works well if you want:
+
+1. iPhone capture without relying on Apple Notes
+2. Windows friendly processing without a Mac
+3. A raw inbox of captured ideas you can replay later
+
+The request shape is defined in [shortcut-onedrive.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/shortcut-onedrive.json>).
+
+Recommended OneDrive capture folder:
+
+`OneDrive\Shortcuts\thought-pipeline\Ideas`
+
+## Step 15: Build The OneDrive Shortcut
+
+On your iPhone:
+
+1. Open the Shortcuts app
+2. Create a new Shortcut
+3. Add a `Dictate Text` action
+4. Add a `Current Date` action
+5. Add a `Text` action that builds the JSON body
+6. Add a `Save File` action
+
+Use this body shape:
+
+```json
+{
+  "raw_idea": "[Dictated Text]",
+  "captured_at": "[Current Date In ISO 8601]",
+  "source": "onedrive_shortcut",
+  "capture_id": "[UUID Or Timestamp Based Id]"
+}
+```
+
+Set `Save File` like this:
+
+1. Service
+   OneDrive
+2. Destination folder
+   `Shortcuts/thought-pipeline/Ideas`
+3. Ask where to save
+   Off
+4. File name
+   Something unique such as `idea-YYYYMMDD-HHMMSS.json`
+
+Important note:
+
+The file contents should be the JSON payload.
+
+## Step 16: Process OneDrive Shortcut Files
+
+Once OneDrive syncs the files to your computer, run:
+
+```powershell
+python scripts/run_ingestion.py --source onedrive --folder Ideas --pretty
+```
+
+What this does:
+
+1. Reads each JSON file from the OneDrive `Ideas` folder
+2. Validates it against the input schema
+3. Writes the raw capture to `output/captured/onedrive`
+4. Enriches it with the local or OpenAI provider
+5. Writes enriched output to `output/enriched/onedrive`
+6. Moves processed source files to `output/processed/onedrive`
+7. Moves failed files to `output/failed/onedrive`
+
+If you want the OneDrive path to post raw payloads into n8n too, run:
+
+```powershell
+python scripts/run_ingestion.py --source onedrive --folder Ideas --url "https://your-n8n-host/webhook/thought-pipeline" --secret "replace-me" --pretty
+```
+
+That keeps the same webhook contract used by the Apple Notes path.
+
+## Step 17: Build The Dual Write Shortcut
+
+Use this when you want the Shortcut to write to both Apple Notes and OneDrive in one run.
+
+The payload example is [shortcut-dual-write.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/shortcut-dual-write.json>).
+
+On your iPhone:
+
+1. Open the Shortcuts app
+2. Create a new Shortcut
+3. Add a `Dictate Text` action
+4. Add a `Current Date` action
+5. Add a `Text` action that builds the JSON payload
+6. Add an `Append to Note` or `Create Note` action for Apple Notes
+7. Add a `Save File` action for OneDrive
+
+Use the dictated text as the Apple Notes body.
+
+Use this JSON body for the OneDrive file:
+
+```json
+{
+  "raw_idea": "[Dictated Text]",
+  "captured_at": "[Current Date In ISO 8601]",
+  "source": "onedrive_shortcut",
+  "capture_id": "[UUID Or Timestamp Based Id]"
+}
+```
+
+Recommended sequence:
+
+1. Dictate the idea once
+2. Write the plain idea text into the `Ideas` note location in Apple Notes
+3. Save the JSON payload into `Shortcuts/thought-pipeline/Ideas` in OneDrive
+
+Important note:
+
+This is two separate writes.
+
+The Apple Notes path will later produce its own `ios_notes` payload when the Mac mini reads that note.
+
+The OneDrive path will process the JSON file directly as `onedrive_shortcut`.
+
+If you run both ingestion workers on the same idea, you should expect two captures unless duplicate detection is added later.
+
+## Step 18: Optional Direct Shortcut Path
 
 You may still want a direct Shortcut path.
 
@@ -524,9 +725,11 @@ This is optional now.
 
 Use it only if you want the phone to send payloads directly instead of relying on Apple Notes sync.
 
-The request shape is defined in [iPhone-shortcut.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/iPhone-shortcut.json>).
+Use the same contract shape as the OneDrive Shortcut path, but send it with `Get Contents of URL` instead of `Save File`.
 
-## Step 15: Build The iPhone Shortcut
+The direct webhook request example is [shortcut-direct-webhook.json](</C:/Users/mick0/OneDrive/Documents/Code & Dev/GitHub/thought-pipeline/shortcut-direct-webhook.json>).
+
+## Step 19: Build The Direct To Webhook Shortcut
 
 On your iPhone:
 
@@ -564,7 +767,7 @@ Important beginner note:
 
 The square bracket values above are placeholders. In Shortcuts, each one should be replaced with the real Shortcut variable token, not the literal text in brackets.
 
-## Step 16: Test The Shortcut
+## Step 20: Test The Shortcut
 
 Do one simple test first.
 
@@ -639,8 +842,8 @@ Fix:
 
 Fix:
 
-1. Check `output/pending-webhook`
-2. Check `output/ios-notes-run.log`
+1. Check `output/pending-webhook/apple-notes`
+2. Check `output/logs/apple-notes-run.log`
 3. Check the webhook URL and secret
 4. Wait for the next scheduled run or run the worker manually again
 
@@ -648,7 +851,7 @@ Fix:
 
 Fix:
 
-1. Check `output/launchd.stderr.log`
+1. Check `output/logs/launchd.stderr.log`
 2. Make sure the Python path on the Mac mini is correct
 3. Make sure the repo path did not change after installing the job
 4. Unload and load the plist again

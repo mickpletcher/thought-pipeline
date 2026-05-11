@@ -9,8 +9,8 @@
 - [ ] Run `python3 scripts/pull_ios_notes.py --folder Ideas --dry-run --stdout`
 - [ ] Review the generated normalized payload
 - [ ] Run `python3 scripts/pull_ios_notes.py --folder Ideas`
-- [ ] Confirm `output/ios-notes` contains note payload files
-- [ ] Confirm `output/ios-notes-state.json` exists
+- [ ] Confirm `output/captured/apple-notes` contains note payload files
+- [ ] Confirm `output/state/apple-notes.json` exists
 - [ ] Rerun the worker and confirm unchanged notes are not reposted
 
 ## Hosted Flow Tasks
@@ -24,15 +24,15 @@
 ## Retry Tasks
 
 - [ ] Intentionally break webhook delivery
-- [ ] Run the worker and confirm files appear in `output/pending-webhook`
+- [ ] Run the worker and confirm files appear in `output/pending-webhook/apple-notes`
 - [ ] Restore webhook delivery
 - [ ] Run the worker again and confirm queued files are cleared
-- [ ] Review `output/ios-notes-run.log` for both failure and recovery evidence
+- [ ] Review `output/logs/apple-notes-run.log` for both failure and recovery evidence
 
 ## Scheduled Worker Tasks
 
 - [ ] Run `python3 scripts/install_macos_worker.py --folder Ideas --url "<webhook>" --secret "<secret>" --interval-seconds 300 --load`
 - [ ] Confirm `~/Library/LaunchAgents/com.thoughtpipeline.notespull.plist` exists
-- [ ] Confirm `output/launchd.stdout.log` and `output/launchd.stderr.log` are created
+- [ ] Confirm `output/logs/launchd.stdout.log` and `output/logs/launchd.stderr.log` are created
 - [ ] Confirm scheduled runs happen without manual execution
 - [ ] Update README with any Mac mini specific corrections discovered during validation

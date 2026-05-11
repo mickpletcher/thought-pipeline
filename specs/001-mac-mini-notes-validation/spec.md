@@ -21,7 +21,7 @@ The MVP is considered proven when the following path works end to end:
 1. Create a new idea note in the configured Apple Notes folder on iPhone
 2. Wait for the note to sync to the Mac mini
 3. Run the worker manually or through launchd
-4. Observe a normalized payload written under `output/ios-notes`
+4. Observe a normalized payload written under `output/captured/apple-notes`
 5. Observe the payload delivered to n8n
 6. Observe a valid enriched JSON response
 7. Confirm rerunning the worker does not repost the unchanged note
@@ -56,12 +56,12 @@ The hosted flow must return the same output schema already checked in:
 
 Mac mini worker artifacts:
 
-1. `output/ios-notes`
-2. `output/ios-notes-state.json`
-3. `output/pending-webhook`
-4. `output/ios-notes-run.log`
-5. `output/launchd.stdout.log`
-6. `output/launchd.stderr.log`
+1. `output/captured/apple-notes`
+2. `output/state/apple-notes.json`
+3. `output/pending-webhook/apple-notes`
+4. `output/logs/apple-notes-run.log`
+5. `output/logs/launchd.stdout.log`
+6. `output/logs/launchd.stderr.log`
 
 ## Constraints
 

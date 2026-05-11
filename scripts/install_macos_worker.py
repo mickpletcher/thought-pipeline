@@ -45,6 +45,10 @@ def output_dir() -> Path:
     return ROOT / "output"
 
 
+def logs_dir() -> Path:
+    return output_dir() / "logs"
+
+
 def plist_path(label: str) -> Path:
     return launch_agents_dir() / f"{label}.plist"
 
@@ -55,14 +59,15 @@ def main() -> int:
         raise SystemExit("Could not find python. Pass --python-path explicitly.")
     launch_agents_dir().mkdir(parents=True, exist_ok=True)
     output_dir().mkdir(parents=True, exist_ok=True)
+    logs_dir().mkdir(parents=True, exist_ok=True)
     plist = {
         "Label": args.label,
         "ProgramArguments": build_program_arguments(args),
         "WorkingDirectory": str(ROOT),
         "RunAtLoad": True,
         "StartInterval": args.interval_seconds,
-        "StandardOutPath": str(output_dir() / "launchd.stdout.log"),
-        "StandardErrorPath": str(output_dir() / "launchd.stderr.log"),
+        "StandardOutPath": str(logs_dir() / "launchd.stdout.log"),
+        "StandardErrorPath": str(logs_dir() / "launchd.stderr.log"),
     }
     target = plist_path(args.label)
     with target.open("wb") as handle:

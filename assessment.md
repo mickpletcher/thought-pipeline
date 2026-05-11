@@ -12,26 +12,36 @@ The repo currently describes a larger product vision than it implements.
 
 The project should support Apple Notes as an ingestion source for ideas created on iPhone.
 
+The repo also supports a OneDrive folder ingestion path for ideas captured by an iPhone Shortcut.
+
+Both ingestion paths now use the same repo side output layout with source named subfolders under `output`.
+
+The repo now has a single ingestion entry point so the preferred source can be chosen by argument or environment setting.
+
 The actual tracked implementation is much smaller:
 
 1. `README.md`
    Product vision, target architecture, installation outline, and sample payloads.
-2. `iPhone-shortcut.json`
-   Optional direct Shortcut payload example.
-3. `schemas/`
+2. `shortcut-onedrive.json`
+   OneDrive Shortcut payload example.
+3. `shortcut-direct-webhook.json`
+   Direct Shortcut to webhook payload example.
+4. `shortcut-dual-write.json`
+   Shortcut example that writes to Apple Notes and OneDrive in the same run.
+5. `schemas/`
    Input and output JSON schemas for the MVP contract.
-4. `samples/`
+6. `samples/`
    Checked in sample input and sample output payloads.
-5. `scripts/`
+7. `scripts/`
    Local enrichment, sample posting, and contract validation helpers.
-6. `workflows/`
+8. `workflows/`
    n8n MVP workflow export draft.
-7. `templates/`
+9. `templates/`
    macOS launchd template for the Mac mini worker path.
-8. `requirements.txt`
+10. `requirements.txt`
    Python dependencies for local validation and replay.
-9. `LICENSE`
-10. `.gitignore`
+11. `LICENSE`
+12. `.gitignore`
 
 ## What Is Implemented
 
@@ -58,9 +68,21 @@ This contract is now backed by checked in JSON schemas.
 
 The repo now includes a macOS script that reads notes from Apple Notes through `osascript`, converts each note to the input contract, tracks processed notes in a local state file, can post normalized payloads to the webhook, and can queue failed posts for retry.
 
-### 4. Mac mini worker path
+### 4. OneDrive Shortcut path
+
+The repo now includes a Windows friendly OneDrive ingestion script that reads shortcut generated JSON files from a synced folder, validates them against the same input contract, writes raw captures and enriched output into the shared `output` tree, optionally posts the raw payload to the webhook, and archives or isolates files based on success.
+
+### 5. Dual write Shortcut path
+
+The repo now documents a dual write Shortcut pattern where one Shortcut run writes the plain idea text into Apple Notes and writes the JSON payload into OneDrive. This keeps both ingestion paths available to the user, but it will create two later captures unless duplicate detection is added.
+
+### 6. Mac mini worker path
 
 The repo now includes a macOS worker installer that creates a launchd job for a scheduled pull on the Mac mini.
+
+### 7. Source selection
+
+The repo now includes `scripts/run_ingestion.py` so a user can choose `apple-notes` or `onedrive` as the preferred ingestion source without having to remember separate commands.
 
 ## What Is Not Implemented
 

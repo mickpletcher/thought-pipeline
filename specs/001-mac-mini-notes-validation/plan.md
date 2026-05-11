@@ -14,8 +14,8 @@ Validate the worker on the Mac mini without n8n.
 Validate local worker artifacts.
 
 1. Run `pull_ios_notes.py` without `--dry-run`.
-2. Confirm files are written under `output/ios-notes`.
-3. Confirm `output/ios-notes-state.json` is written.
+2. Confirm files are written under `output/captured/apple-notes`.
+3. Confirm `output/state/apple-notes.json` is written.
 4. Confirm rerun behavior skips unchanged notes.
 
 ## Phase 3
@@ -32,7 +32,7 @@ Validate n8n handoff.
 Validate failure and retry behavior.
 
 1. Run the worker with an unavailable webhook.
-2. Confirm payloads land in `output/pending-webhook`.
+2. Confirm payloads land in `output/pending-webhook/apple-notes`.
 3. Restore the webhook.
 4. Run the worker again.
 5. Confirm queued payloads are delivered and removed.

@@ -25,6 +25,7 @@ def validate(instance_path: Path, schema_path: Path) -> None:
 def main() -> int:
     validate(ROOT / "samples" / "sample-input.json", ROOT / "schemas" / "input.schema.json")
     validate(ROOT / "samples" / "sample-ios-note-payload.json", ROOT / "schemas" / "input.schema.json")
+    validate(ROOT / "samples" / "sample-onedrive-shortcut-payload.json", ROOT / "schemas" / "input.schema.json")
     validate(ROOT / "samples" / "sample-output.json", ROOT / "schemas" / "output.schema.json")
     print("SAMPLES_OK")
     return 0

@@ -16,10 +16,11 @@ from jsonschema import Draft202012Validator
 ROOT = Path(__file__).resolve().parents[1]
 INPUT_SCHEMA_PATH = ROOT / "schemas" / "input.schema.json"
 DEFAULT_OUTPUT_ROOT = ROOT / "output"
-DEFAULT_STATE_PATH = DEFAULT_OUTPUT_ROOT / "ios-notes-state.json"
-DEFAULT_EXPORT_DIR = DEFAULT_OUTPUT_ROOT / "ios-notes"
-DEFAULT_PENDING_DIR = DEFAULT_OUTPUT_ROOT / "pending-webhook"
-DEFAULT_LOG_PATH = DEFAULT_OUTPUT_ROOT / "ios-notes-run.log"
+DEFAULT_SOURCE_NAME = "apple-notes"
+DEFAULT_STATE_PATH = DEFAULT_OUTPUT_ROOT / "state" / f"{DEFAULT_SOURCE_NAME}.json"
+DEFAULT_EXPORT_DIR = DEFAULT_OUTPUT_ROOT / "captured" / DEFAULT_SOURCE_NAME
+DEFAULT_PENDING_DIR = DEFAULT_OUTPUT_ROOT / "pending-webhook" / DEFAULT_SOURCE_NAME
+DEFAULT_LOG_PATH = DEFAULT_OUTPUT_ROOT / "logs" / f"{DEFAULT_SOURCE_NAME}-run.log"
 
 
 def parse_args() -> argparse.Namespace:
